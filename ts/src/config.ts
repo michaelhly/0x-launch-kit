@@ -25,10 +25,7 @@ export const TAKER_FEE_ZRX_UNIT_AMOUNT = !_.isUndefined(process.env.TAKER_FEE_ZR
     ? new BigNumber(process.env.TAKER_FEE_ZRX_UNIT_AMOUNT)
     : new BigNumber(0);
 // Whitelisted token addresses. Set to a '*' instead of an array to allow all tokens.
-export const WHITELISTED_TOKENS: string[] | '*' = [
-    '0x2002d3812f58e35f0ea1ffbf80a75a38c32175fa', // ZRX
-    '0xd0a1e359811322d97991e03f863a0c30c2cf029c', // WETH
-];
+export const WHITELISTED_TOKENS: string[] | '*' = '*';
 // Ethereum RPC url
 export const RPC_URL = !_.isUndefined(process.env.RPC_URL) ? process.env.RPC_URL : 'https://kovan.infura.io/v3';
 // Default ERC20 token precision
