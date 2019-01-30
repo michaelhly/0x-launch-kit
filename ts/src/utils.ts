@@ -81,6 +81,8 @@ function schemaValidationErrorToValidationErrorItem(schemaValidationError: Schem
 }
 
 const mergeSort = (left: any, right: any, side: string): any => {
+    console.log('hello? ts');
+
     const merged: any[] = [];
     var l: number = 0;
     var r: number = 0;
@@ -90,7 +92,7 @@ const mergeSort = (left: any, right: any, side: string): any => {
         let leftPrice = parseInt(leftOrder.takerAssetAmount) / parseInt(leftOrder.makerAssetAmount);
         let rightOrder: any = right[r];
         let rightPrice: number = parseInt(rightOrder.takerAssetAmount) / parseInt(rightOrder.makerAssetAmount);
-        if (side === 'ASKS' ? leftPrice <= rightPrice : leftPrice > rightPrice) {
+        if (side === 'ASKS' ? leftPrice > rightPrice : leftPrice <= rightPrice) {
             merged.push(leftOrder);
             l++;
         } else {
