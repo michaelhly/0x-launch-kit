@@ -21,13 +21,7 @@ exports.utils = {
         }
     },
     mergeSortOrders(signedOrderModels) {
-        const totalOrders = signedOrderModels.length;
-        if (totalOrders < 2) return signedOrderModels;
-        var center = totalOrders >>> 1;
-        var left = signedOrderModels.slice(0, center);
-        var right = signedOrderModels.slice(center, totalOrders);
-
-        return mergeSort(left, right);
+        return mergeSort(signedOrderModels);
     },
 };
 function schemaValidationErrorToValidationErrorItem(schemaValidationError) {
@@ -83,7 +77,7 @@ function schemaValidationErrorToValidationErrorItem(schemaValidationError) {
     }
 }
 
-const mergeSort = (left, right) => {
+const merge = (left, right) => {
     const merged = [];
     var l = 0;
     var r = 0;
@@ -113,4 +107,14 @@ const mergeSort = (left, right) => {
     }
 
     return merged;
+};
+
+const mergeSort = orders => {
+    const totalOrders = orders.length;
+    if (totalOrders < 2) return orders;
+    var center = totalOrders >>> 1;
+    var left = orders.slice(0, center);
+    var right = orders.slice(center, totalOrders);
+
+    return merge(mergeSort(left), mergeSort(right));
 };

@@ -80,7 +80,7 @@ function schemaValidationErrorToValidationErrorItem(schemaValidationError: Schem
     }
 }
 
-const mergeSort = (left: any, right: any): any => {
+const merge = (left: any, right: any): any => {
     const merged: any[] = [];
     var l: number = 0;
     var r: number = 0;
@@ -122,5 +122,5 @@ export const mergeSortOrders = (
     var left = signedOrderModels.slice(0, center);
     var right = signedOrderModels.slice(center, totalOrders);
 
-    return mergeSort(left, right) as Array<Required<SignedOrderModel>>;
+    return merge(mergeSortOrders(left), mergeSortOrders(right)) as Array<Required<SignedOrderModel>>;
 };
