@@ -80,19 +80,18 @@ function schemaValidationErrorToValidationErrorItem(schemaValidationError: Schem
     }
 }
 
-const mergeSort = (left: any, right: any, side: string): any => {
-    console.log('hello? ts');
-
+const mergeSort = (left: any, right: any): any => {
     const merged: any[] = [];
     var l: number = 0;
     var r: number = 0;
 
     while (l < left.length && r < right.length) {
         let leftOrder: any = left[l];
-        let leftPrice = parseInt(leftOrder.takerAssetAmount) / parseInt(leftOrder.makerAssetAmount);
+        let leftPrice: number = parseInt(leftOrder.takerAssetAmount) / parseInt(leftOrder.makerAssetAmount);
         let rightOrder: any = right[r];
         let rightPrice: number = parseInt(rightOrder.takerAssetAmount) / parseInt(rightOrder.makerAssetAmount);
-        if (side === 'ASKS' ? leftPrice > rightPrice : leftPrice <= rightPrice) {
+
+        if (leftPrice > rightPrice) {
             merged.push(leftOrder);
             l++;
         } else {
@@ -116,7 +115,6 @@ const mergeSort = (left: any, right: any, side: string): any => {
 
 export const mergeSortOrders = (
     signedOrderModels: Array<Required<SignedOrderModel>>,
-    side: string,
 ): Array<Required<SignedOrderModel>> => {
     const totalOrders = signedOrderModels.length;
     if (totalOrders < 2) return signedOrderModels;
@@ -124,5 +122,5 @@ export const mergeSortOrders = (
     var left = signedOrderModels.slice(0, center);
     var right = signedOrderModels.slice(center, totalOrders);
 
-    return mergeSort(left, right, side) as Array<Required<SignedOrderModel>>;
+    return mergeSort(left, right) as Array<Required<SignedOrderModel>>;
 };

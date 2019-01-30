@@ -20,14 +20,14 @@ exports.utils = {
             throw new errors_1.ValidationError(validationErrorItems);
         }
     },
-    mergeSortOrders(signedOrderModels, side) {
+    mergeSortOrders(signedOrderModels) {
         const totalOrders = signedOrderModels.length;
         if (totalOrders < 2) return signedOrderModels;
         var center = totalOrders >>> 1;
         var left = signedOrderModels.slice(0, center);
         var right = signedOrderModels.slice(center, totalOrders);
 
-        return mergeSort(left, right, side);
+        return mergeSort(left, right);
     },
 };
 function schemaValidationErrorToValidationErrorItem(schemaValidationError) {
@@ -83,9 +83,7 @@ function schemaValidationErrorToValidationErrorItem(schemaValidationError) {
     }
 }
 
-const mergeSort = (left, right, side) => {
-    console.log('hello? js');
-
+const mergeSort = (left, right) => {
     const merged = [];
     var l = 0;
     var r = 0;
@@ -95,7 +93,8 @@ const mergeSort = (left, right, side) => {
         let leftPrice = parseInt(leftOrder.takerAssetAmount) / parseInt(leftOrder.makerAssetAmount);
         let rightOrder = right[r];
         let rightPrice = parseInt(rightOrder.takerAssetAmount) / parseInt(rightOrder.makerAssetAmount);
-        if (side === 'ASKS' ? leftPrice > rightPrice : leftPrice <= rightPrice) {
+
+        if (leftPrice > rightPrice) {
             merged.push(leftOrder);
             l++;
         } else {
@@ -103,7 +102,6 @@ const mergeSort = (left, right, side) => {
             r++;
         }
     }
-
     while (l < left.length) {
         merged.push(left[l]);
         l++;
