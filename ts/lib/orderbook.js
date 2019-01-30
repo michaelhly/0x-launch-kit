@@ -1,29 +1,27 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const _0x_js_1 = require("0x.js");
-const order_watcher_1 = require("@0x/order-watcher");
-const types_1 = require("@0x/types");
-const utils_1 = require("@0x/utils");
-const _ = require("lodash");
-const config_1 = require("./config");
-const constants_1 = require("./constants");
-const db_connection_1 = require("./db_connection");
-const SignedOrderModel_1 = require("./models/SignedOrderModel");
-const paginator_1 = require("./paginator");
-const utils_2 = require("./utils");
+'use strict';
+Object.defineProperty(exports, '__esModule', { value: true });
+const _0x_js_1 = require('0x.js');
+const order_watcher_1 = require('@0x/order-watcher');
+const types_1 = require('@0x/types');
+const utils_1 = require('@0x/utils');
+const _ = require('lodash');
+const config_1 = require('./config');
+const constants_1 = require('./constants');
+const db_connection_1 = require('./db_connection');
+const SignedOrderModel_1 = require('./models/SignedOrderModel');
+const paginator_1 = require('./paginator');
+const utils_2 = require('./utils');
 // Mapping from an order hash to the timestamp when it was shadowed
 const shadowedOrders = new Map();
 exports.orderBook = {
     onOrderStateChangeCallback: (err, orderState) => {
         if (!_.isNull(err)) {
             utils_2.utils.log(err);
-        }
-        else {
+        } else {
             const state = orderState;
             if (!state.isValid) {
                 shadowedOrders.set(state.orderHash, Date.now());
-            }
-            else {
+            } else {
                 shadowedOrders.delete(state.orderHash);
             }
         }
@@ -43,7 +41,7 @@ exports.orderBook = {
             await connection.manager.delete(SignedOrderModel_1.SignedOrderModel, permanentlyExpiredOrders);
         }
     },
-    addOrderAsync: async (signedOrder) => {
+    addOrderAsync: async signedOrder => {
         await orderWatcher.addOrderAsync(signedOrder);
         const signedOrderModel = serializeOrder(signedOrder);
         const connection = db_connection_1.getDBConnection();
@@ -51,8 +49,8 @@ exports.orderBook = {
     },
     getAssetPairsAsync: async (page, perPage, assetDataA, assetDataB) => {
         const connection = db_connection_1.getDBConnection();
-        const signedOrderModels = (await connection.manager.find(SignedOrderModel_1.SignedOrderModel));
-        const erc721AssetDataToAsset = (assetData) => {
+        const signedOrderModels = await connection.manager.find(SignedOrderModel_1.SignedOrderModel);
+        const erc721AssetDataToAsset = assetData => {
             const asset = {
                 minAmount: new _0x_js_1.BigNumber(0),
                 maxAmount: new _0x_js_1.BigNumber(1),
@@ -61,7 +59,7 @@ exports.orderBook = {
             };
             return asset;
         };
-        const erc20AssetDataToAsset = (assetData) => {
+        const erc20AssetDataToAsset = assetData => {
             const asset = {
                 minAmount: new _0x_js_1.BigNumber(0),
                 maxAmount: constants_1.MAX_TOKEN_SUPPLY_POSSIBLE,
@@ -70,7 +68,7 @@ exports.orderBook = {
             };
             return asset;
         };
-        const assetDataToAsset = (assetData) => {
+        const assetDataToAsset = assetData => {
             const assetProxyId = _0x_js_1.assetDataUtils.decodeAssetProxyId(assetData);
             let asset;
             switch (assetProxyId) {
@@ -85,7 +83,7 @@ exports.orderBook = {
             }
             return asset;
         };
-        const signedOrderToAssetPair = (signedOrder) => {
+        const signedOrderToAssetPair = signedOrder => {
             return {
                 assetDataA: assetDataToAsset(signedOrder.makerAssetData),
                 assetDataB: assetDataToAsset(signedOrder.takerAssetData),
@@ -95,15 +93,15 @@ exports.orderBook = {
         let nonPaginatedFilteredAssetPairs;
         if (_.isUndefined(assetDataA) && _.isUndefined(assetDataB)) {
             nonPaginatedFilteredAssetPairs = assetPairsItems;
-        }
-        else if (!_.isUndefined(assetDataA) && !_.isUndefined(assetDataB)) {
-            const containsAssetDataAAndAssetDataB = (assetPair) => (assetPair.assetDataA.assetData === assetDataA && assetPair.assetDataB.assetData === assetDataB) ||
+        } else if (!_.isUndefined(assetDataA) && !_.isUndefined(assetDataB)) {
+            const containsAssetDataAAndAssetDataB = assetPair =>
+                (assetPair.assetDataA.assetData === assetDataA && assetPair.assetDataB.assetData === assetDataB) ||
                 (assetPair.assetDataA.assetData === assetDataB && assetPair.assetDataB.assetData === assetDataA);
             nonPaginatedFilteredAssetPairs = assetPairsItems.filter(containsAssetDataAAndAssetDataB);
-        }
-        else {
+        } else {
             const assetData = assetDataA || assetDataB;
-            const containsAssetData = (assetPair) => assetPair.assetDataA.assetData === assetData || assetPair.assetDataB.assetData === assetData;
+            const containsAssetData = assetPair =>
+                assetPair.assetDataA.assetData === assetData || assetPair.assetDataB.assetData === assetData;
             nonPaginatedFilteredAssetPairs = assetPairsItems.filter(containsAssetData);
         }
         const uniqueNonPaginatedFilteredAssetPairs = _.uniqWith(nonPaginatedFilteredAssetPairs, _.isEqual.bind(_));
@@ -112,12 +110,17 @@ exports.orderBook = {
     },
     getOrderBookAsync: async (page, perPage, baseAssetData, quoteAssetData) => {
         const connection = db_connection_1.getDBConnection();
-        const bidSignedOrderModels = (await connection.manager.find(SignedOrderModel_1.SignedOrderModel, {
+
+        const unsortedBidSignedOrderModels = await connection.manager.find(SignedOrderModel_1.SignedOrderModel, {
             where: { takerAssetData: baseAssetData, makerAssetData: quoteAssetData },
-        }));
-        const askSignedOrderModels = (await connection.manager.find(SignedOrderModel_1.SignedOrderModel, {
+        });
+        const bidSignedOrderModels = utils_2.utils.mergeSortOrders(unsortedBidSignedOrderModels, 'BIDS');
+
+        const unsortedAskSignedOrderModels = await connection.manager.find(SignedOrderModel_1.SignedOrderModel, {
             where: { takerAssetData: quoteAssetData, makerAssetData: baseAssetData },
-        }));
+        });
+        const askSignedOrderModels = utils_2.utils.mergeSortOrders(unsortedAskSignedOrderModels, 'ASKS');
+
         const bidApiOrders = bidSignedOrderModels
             .map(deserializeOrder)
             .filter(order => !shadowedOrders.has(_0x_js_1.orderHashUtils.getOrderHashHex(order)))
@@ -147,45 +150,59 @@ exports.orderBook = {
             feeRecipientAddress: ordersFilterParams.feeRecipientAddress,
         };
         const filterObject = _.pickBy(filterObjectWithValuesIfExist, _.identity.bind(_));
-        const signedOrderModels = (await connection.manager.find(SignedOrderModel_1.SignedOrderModel, { where: filterObject }));
+        const signedOrderModels = await connection.manager.find(SignedOrderModel_1.SignedOrderModel, {
+            where: filterObject,
+        });
         let signedOrders = _.map(signedOrderModels, deserializeOrder);
         // Post-filters
         signedOrders = signedOrders
             .filter(order => !shadowedOrders.has(_0x_js_1.orderHashUtils.getOrderHashHex(order)))
             .filter(
-        // traderAddress
-        signedOrder => _.isUndefined(ordersFilterParams.traderAddress) ||
-            signedOrder.makerAddress === ordersFilterParams.traderAddress ||
-            signedOrder.takerAddress === ordersFilterParams.traderAddress)
+                // traderAddress
+                signedOrder =>
+                    _.isUndefined(ordersFilterParams.traderAddress) ||
+                    signedOrder.makerAddress === ordersFilterParams.traderAddress ||
+                    signedOrder.takerAddress === ordersFilterParams.traderAddress,
+            )
             .filter(
-        // makerAssetAddress
-        signedOrder => _.isUndefined(ordersFilterParams.makerAssetAddress) ||
-            includesTokenAddress(signedOrder.makerAssetData, ordersFilterParams.makerAssetAddress))
+                // makerAssetAddress
+                signedOrder =>
+                    _.isUndefined(ordersFilterParams.makerAssetAddress) ||
+                    includesTokenAddress(signedOrder.makerAssetData, ordersFilterParams.makerAssetAddress),
+            )
             .filter(
-        // takerAssetAddress
-        signedOrder => _.isUndefined(ordersFilterParams.takerAssetAddress) ||
-            includesTokenAddress(signedOrder.takerAssetData, ordersFilterParams.takerAssetAddress))
+                // takerAssetAddress
+                signedOrder =>
+                    _.isUndefined(ordersFilterParams.takerAssetAddress) ||
+                    includesTokenAddress(signedOrder.takerAssetData, ordersFilterParams.takerAssetAddress),
+            )
             .filter(
-        // makerAssetProxyId
-        signedOrder => _.isUndefined(ordersFilterParams.makerAssetProxyId) ||
-            _0x_js_1.assetDataUtils.decodeAssetDataOrThrow(signedOrder.makerAssetData).assetProxyId ===
-                ordersFilterParams.makerAssetProxyId)
+                // makerAssetProxyId
+                signedOrder =>
+                    _.isUndefined(ordersFilterParams.makerAssetProxyId) ||
+                    _0x_js_1.assetDataUtils.decodeAssetDataOrThrow(signedOrder.makerAssetData).assetProxyId ===
+                        ordersFilterParams.makerAssetProxyId,
+            )
             .filter(
-        // makerAssetProxyId
-        signedOrder => _.isUndefined(ordersFilterParams.takerAssetProxyId) ||
-            _0x_js_1.assetDataUtils.decodeAssetDataOrThrow(signedOrder.takerAssetData).assetProxyId ===
-                ordersFilterParams.takerAssetProxyId);
+                // makerAssetProxyId
+                signedOrder =>
+                    _.isUndefined(ordersFilterParams.takerAssetProxyId) ||
+                    _0x_js_1.assetDataUtils.decodeAssetDataOrThrow(signedOrder.takerAssetData).assetProxyId ===
+                        ordersFilterParams.takerAssetProxyId,
+            );
         const apiOrders = signedOrders.map(signedOrder => ({ metaData: {}, order: signedOrder }));
         const paginatedApiOrders = paginator_1.paginate(apiOrders, page, perPage);
         return paginatedApiOrders;
     },
-    getOrderByHashIfExistsAsync: async (orderHash) => {
+    getOrderByHashIfExistsAsync: async orderHash => {
         const connection = db_connection_1.getDBConnection();
-        const signedOrderModelIfExists = await connection.manager.findOne(SignedOrderModel_1.SignedOrderModel, orderHash);
+        const signedOrderModelIfExists = await connection.manager.findOne(
+            SignedOrderModel_1.SignedOrderModel,
+            orderHash,
+        );
         if (_.isUndefined(signedOrderModelIfExists)) {
             return undefined;
-        }
-        else {
+        } else {
             const deserializedOrder = deserializeOrder(signedOrderModelIfExists);
             return { metaData: {}, order: deserializedOrder };
         }
@@ -200,12 +217,11 @@ const includesTokenAddress = (assetData, tokenAddress) => {
             }
         }
         return false;
-    }
-    else {
+    } else {
         return decodedAssetData.tokenAddress === tokenAddress;
     }
 };
-const deserializeOrder = (signedOrderModel) => {
+const deserializeOrder = signedOrderModel => {
     const signedOrder = {
         signature: signedOrderModel.signature,
         senderAddress: signedOrderModel.senderAddress,
@@ -224,7 +240,7 @@ const deserializeOrder = (signedOrderModel) => {
     };
     return signedOrder;
 };
-const serializeOrder = (signedOrder) => {
+const serializeOrder = signedOrder => {
     const signedOrderModel = new SignedOrderModel_1.SignedOrderModel({
         signature: signedOrder.signature,
         senderAddress: signedOrder.senderAddress,
@@ -249,4 +265,8 @@ provider.addProvider(new _0x_js_1.RPCSubprovider(config_1.RPC_URL));
 provider.start();
 const orderWatcher = new order_watcher_1.OrderWatcher(provider, config_1.NETWORK_ID);
 orderWatcher.subscribe(exports.orderBook.onOrderStateChangeCallback);
-utils_1.intervalUtils.setAsyncExcludingInterval(exports.orderBook.onCleanUpInvalidOrdersAsync.bind(exports.orderBook), config_1.PERMANENT_CLEANUP_INTERVAL_MS, utils_2.utils.log);
+utils_1.intervalUtils.setAsyncExcludingInterval(
+    exports.orderBook.onCleanUpInvalidOrdersAsync.bind(exports.orderBook),
+    config_1.PERMANENT_CLEANUP_INTERVAL_MS,
+    utils_2.utils.log,
+);

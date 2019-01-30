@@ -3,6 +3,7 @@ import { ValidationError as SchemaValidationError } from 'jsonschema';
 import * as _ from 'lodash';
 
 import { ValidationError, ValidationErrorCodes, ValidationErrorItem } from './errors';
+import { SignedOrderModel } from './models/SignedOrderModel';
 
 const schemaValidator = new SchemaValidator();
 
@@ -78,3 +79,48 @@ function schemaValidationErrorToValidationErrorItem(schemaValidationError: Schem
         throw new Error(`Unknnown schema validation error name: ${schemaValidationError.name}`);
     }
 }
+
+const mergeSort = (left: any, right: any, side: string): any => {
+    const merged: any[] = [];
+    var l: number = 0;
+    var r: number = 0;
+
+    while (l < left.length && r < right.length) {
+        let leftOrder: any = left[l];
+        let leftPrice = parseInt(leftOrder.takerAssetAmount) / parseInt(leftOrder.makerAssetAmount);
+        let rightOrder: any = right[r];
+        let rightPrice: number = parseInt(rightOrder.takerAssetAmount) / parseInt(rightOrder.makerAssetAmount);
+        if (side === 'ASKS' ? leftPrice <= rightPrice : leftPrice > rightPrice) {
+            merged.push(leftOrder);
+            l++;
+        } else {
+            merged.push(rightOrder);
+            r++;
+        }
+    }
+
+    while (l < left.length) {
+        merged.push(left[l]);
+        l++;
+    }
+
+    while (r < right.length) {
+        merged.push(right[r]);
+        r++;
+    }
+
+    return merged;
+};
+
+export const mergeSortOrders = (
+    signedOrderModels: Array<Required<SignedOrderModel>>,
+    side: string,
+): Array<Required<SignedOrderModel>> => {
+    const totalOrders = signedOrderModels.length;
+    if (totalOrders < 2) return signedOrderModels;
+    var center = totalOrders >>> 1;
+    var left = signedOrderModels.slice(0, center);
+    var right = signedOrderModels.slice(center, totalOrders);
+
+    return mergeSort(left, right, side) as Array<Required<SignedOrderModel>>;
+};
