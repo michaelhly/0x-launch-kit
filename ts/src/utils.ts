@@ -80,16 +80,27 @@ function schemaValidationErrorToValidationErrorItem(schemaValidationError: Schem
     }
 }
 
-const merge = (left: any, right: any): any => {
-    const merged: any[] = [];
+export enum OrderbookSide {
+    ASKS,
+    BIDS,
+}
+
+const calcPrice = (side: OrderbookSide, order: SignedOrderModel): number => {
+    return side === OrderbookSide.ASKS
+        ? parseInt(order.takerAssetAmount as string) / parseInt(order.makerAssetAmount as string)
+        : parseInt(order.makerAssetAmount as string) / parseInt(order.takerAssetAmount as string);
+};
+
+const merge = (side: OrderbookSide, left: SignedOrderModel[], right: SignedOrderModel[]): SignedOrderModel[] => {
+    const merged: SignedOrderModel[] = [];
     var l: number = 0;
     var r: number = 0;
 
     while (l < left.length && r < right.length) {
-        let leftOrder: any = left[l];
-        let leftPrice: number = parseInt(leftOrder.takerAssetAmount) / parseInt(leftOrder.makerAssetAmount);
-        let rightOrder: any = right[r];
-        let rightPrice: number = parseInt(rightOrder.takerAssetAmount) / parseInt(rightOrder.makerAssetAmount);
+        let leftOrder: SignedOrderModel = left[l];
+        let leftPrice: number = calcPrice(side, leftOrder);
+        let rightOrder: SignedOrderModel = right[r];
+        let rightPrice: number = calcPrice(side, rightOrder);
 
         if (leftPrice > rightPrice) {
             merged.push(leftOrder);
@@ -114,6 +125,7 @@ const merge = (left: any, right: any): any => {
 };
 
 export const mergeSortOrders = (
+    side: OrderbookSide,
     signedOrderModels: Array<Required<SignedOrderModel>>,
 ): Array<Required<SignedOrderModel>> => {
     const totalOrders = signedOrderModels.length;
@@ -122,5 +134,5 @@ export const mergeSortOrders = (
     var left = signedOrderModels.slice(0, center);
     var right = signedOrderModels.slice(center, totalOrders);
 
-    return merge(mergeSortOrders(left), mergeSortOrders(right)) as Array<Required<SignedOrderModel>>;
+    return merge(side, mergeSortOrders(side, left), mergeSortOrders(side, right)) as Array<Required<SignedOrderModel>>;
 };

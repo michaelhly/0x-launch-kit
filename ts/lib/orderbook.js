@@ -114,12 +114,12 @@ exports.orderBook = {
         const unsortedBidSignedOrderModels = await connection.manager.find(SignedOrderModel_1.SignedOrderModel, {
             where: { takerAssetData: baseAssetData, makerAssetData: quoteAssetData },
         });
-        const bidSignedOrderModels = utils_2.utils.mergeSortOrders(unsortedBidSignedOrderModels);
+        const bidSignedOrderModels = utils_2.utils.mergeSortOrders('BIDS', unsortedBidSignedOrderModels);
 
         const unsortedAskSignedOrderModels = await connection.manager.find(SignedOrderModel_1.SignedOrderModel, {
             where: { takerAssetData: quoteAssetData, makerAssetData: baseAssetData },
         });
-        const askSignedOrderModels = utils_2.utils.mergeSortOrders(unsortedAskSignedOrderModels);
+        const askSignedOrderModels = utils_2.utils.mergeSortOrders('ASKS', unsortedAskSignedOrderModels);
 
         const bidApiOrders = bidSignedOrderModels
             .map(deserializeOrder)

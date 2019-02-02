@@ -17,7 +17,7 @@ import { MAX_TOKEN_SUPPLY_POSSIBLE } from './constants';
 import { getDBConnection } from './db_connection';
 import { SignedOrderModel } from './models/SignedOrderModel';
 import { paginate } from './paginator';
-import { utils, mergeSortOrders } from './utils';
+import { utils, mergeSortOrders, OrderbookSide } from './utils';
 
 // Mapping from an order hash to the timestamp when it was shadowed
 const shadowedOrders: Map<string, number> = new Map();
@@ -135,12 +135,12 @@ export const orderBook = {
         const unsortedBidSignedOrderModels = (await connection.manager.find(SignedOrderModel, {
             where: { takerAssetData: baseAssetData, makerAssetData: quoteAssetData },
         })) as Array<Required<SignedOrderModel>>;
-        const bidSignedOrderModels = mergeSortOrders(unsortedBidSignedOrderModels);
+        const bidSignedOrderModels = mergeSortOrders(OrderbookSide.BIDS, unsortedBidSignedOrderModels);
 
         const unsortedAskSignedOrderModels = (await connection.manager.find(SignedOrderModel, {
             where: { takerAssetData: quoteAssetData, makerAssetData: baseAssetData },
         })) as Array<Required<SignedOrderModel>>;
-        const askSignedOrderModels = mergeSortOrders(unsortedAskSignedOrderModels);
+        const askSignedOrderModels = mergeSortOrders(OrderbookSide.ASKS, unsortedAskSignedOrderModels);
 
         const bidApiOrders: APIOrder[] = bidSignedOrderModels
             .map(deserializeOrder)

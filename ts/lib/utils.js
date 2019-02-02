@@ -20,8 +20,8 @@ exports.utils = {
             throw new errors_1.ValidationError(validationErrorItems);
         }
     },
-    mergeSortOrders(signedOrderModels) {
-        return mergeSort(signedOrderModels);
+    mergeSortOrders(side, signedOrderModels) {
+        return mergeSort(side, signedOrderModels);
     },
 };
 function schemaValidationErrorToValidationErrorItem(schemaValidationError) {
@@ -77,16 +77,22 @@ function schemaValidationErrorToValidationErrorItem(schemaValidationError) {
     }
 }
 
-const merge = (left, right) => {
+const calcPrice = (side, order) => {
+    return side === 'ASKS'
+        ? parseInt(order.takerAssetAmount) / parseInt(order.makerAssetAmount)
+        : parseInt(order.makerAssetAmount) / parseInt(order.takerAssetAmount);
+};
+
+const merge = (side, left, right) => {
     const merged = [];
     var l = 0;
     var r = 0;
 
     while (l < left.length && r < right.length) {
         let leftOrder = left[l];
-        let leftPrice = parseInt(leftOrder.takerAssetAmount) / parseInt(leftOrder.makerAssetAmount);
+        let leftPrice = calcPrice(side, leftOrder);
         let rightOrder = right[r];
-        let rightPrice = parseInt(rightOrder.takerAssetAmount) / parseInt(rightOrder.makerAssetAmount);
+        let rightPrice = calcPrice(side, rightOrder);
 
         if (leftPrice > rightPrice) {
             merged.push(leftOrder);
@@ -109,12 +115,12 @@ const merge = (left, right) => {
     return merged;
 };
 
-const mergeSort = orders => {
+const mergeSort = (side, orders) => {
     const totalOrders = orders.length;
     if (totalOrders < 2) return orders;
     var center = totalOrders >>> 1;
     var left = orders.slice(0, center);
     var right = orders.slice(center, totalOrders);
 
-    return merge(mergeSort(left), mergeSort(right));
+    return merge(side, mergeSort(side, left), mergeSort(side, right));
 };
