@@ -2,6 +2,7 @@ import { Schema, SchemaValidator } from '@0x/json-schemas';
 import { ValidationError as SchemaValidationError } from 'jsonschema';
 import * as _ from 'lodash';
 
+import { RADIX_STRING } from './config';
 import { ValidationError, ValidationErrorCodes, ValidationErrorItem } from './errors';
 import { SignedOrderModel } from './models/SignedOrderModel';
 
@@ -81,26 +82,28 @@ function schemaValidationErrorToValidationErrorItem(schemaValidationError: Schem
 }
 
 export enum OrderbookSide {
-    ASKS,
-    BIDS,
+    Asks,
+    Bids,
 }
 
 const calcPrice = (side: OrderbookSide, order: SignedOrderModel): number => {
-    return side === OrderbookSide.ASKS
-        ? parseInt(order.takerAssetAmount as string) / parseInt(order.makerAssetAmount as string)
-        : parseInt(order.makerAssetAmount as string) / parseInt(order.takerAssetAmount as string);
+    return side === OrderbookSide.Asks
+        ? parseInt(order.takerAssetAmount as string, RADIX_STRING) /
+              parseInt(order.makerAssetAmount as string, RADIX_STRING)
+        : parseInt(order.makerAssetAmount as string, RADIX_STRING) /
+              parseInt(order.takerAssetAmount as string, RADIX_STRING);
 };
 
 const merge = (side: OrderbookSide, left: SignedOrderModel[], right: SignedOrderModel[]): SignedOrderModel[] => {
     const merged: SignedOrderModel[] = [];
-    var l: number = 0;
-    var r: number = 0;
+    let l: number = 0;
+    let r: number = 0;
 
     while (l < left.length && r < right.length) {
-        let leftOrder: SignedOrderModel = left[l];
-        let leftPrice: number = calcPrice(side, leftOrder);
-        let rightOrder: SignedOrderModel = right[r];
-        let rightPrice: number = calcPrice(side, rightOrder);
+        const leftOrder: SignedOrderModel = left[l];
+        const leftPrice: number = calcPrice(side, leftOrder);
+        const rightOrder: SignedOrderModel = right[r];
+        const rightPrice: number = calcPrice(side, rightOrder);
 
         if (leftPrice > rightPrice) {
             merged.push(leftOrder);
@@ -129,10 +132,12 @@ export const mergeSortOrders = (
     signedOrderModels: Array<Required<SignedOrderModel>>,
 ): Array<Required<SignedOrderModel>> => {
     const totalOrders = signedOrderModels.length;
-    if (totalOrders < 2) return signedOrderModels;
-    var center = totalOrders >>> 1;
-    var left = signedOrderModels.slice(0, center);
-    var right = signedOrderModels.slice(center, totalOrders);
+    if (totalOrders < 2) {
+        return signedOrderModels;
+    }
+    const center = totalOrders / 2;
+    const left = signedOrderModels.slice(0, center);
+    const right = signedOrderModels.slice(center, totalOrders);
 
     return merge(side, mergeSortOrders(side, left), mergeSortOrders(side, right)) as Array<Required<SignedOrderModel>>;
 };
