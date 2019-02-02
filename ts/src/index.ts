@@ -54,6 +54,11 @@ import { utils } from './utils';
      */
     app.get('/v2/order/:orderHash', asyncHandler(handlers.getOrderByHashAsync));
 
+    /**
+     * POST Order and check for matching counter-order. If counter-order found, fill both orders. Otherwise submit order to orderbook.
+     */
+    app.post('/v2/match_order', asyncHandler(handlers.matchBeforeSubmitAsync));
+
     app.use(errorHandler);
 
     app.listen(HTTP_PORT, () => utils.log(`Standard relayer API (HTTP) listening on port ${HTTP_PORT}!`));

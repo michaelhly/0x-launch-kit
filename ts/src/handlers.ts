@@ -96,6 +96,17 @@ export const handlers = {
             res.status(HttpStatus.OK).send(orderIfExists);
         }
     },
+    matchBeforeSubmitAsync: async (req: express.Request, res: express.Response) => {
+        utils.validateSchema(req.body, schemas.signedOrderSchema);
+        const signedOrder = unmarshallOrder(req.body);
+        if (WHITELISTED_TOKENS !== '*') {
+            const allowedTokens: string[] = WHITELISTED_TOKENS;
+            validateAssetDataIsWhitelistedOrThrow(allowedTokens, signedOrder.makerAssetData, 'makerAssetData');
+            validateAssetDataIsWhitelistedOrThrow(allowedTokens, signedOrder.takerAssetData, 'takerAssetData');
+        }
+        await orderBook.addOrderAsync(signedOrder);
+        res.status(HttpStatus.OK).send();
+    },
 };
 
 function validateAssetDataIsWhitelistedOrThrow(allowedTokens: string[], assetData: string, field: string): void {
