@@ -61,7 +61,7 @@ typings/
 .next
 
 # compiled ts sources
-typescript/lib
+ts/lib
 
 # sqlite DB
 database.sqlite
