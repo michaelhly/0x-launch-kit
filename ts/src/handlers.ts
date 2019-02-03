@@ -98,7 +98,9 @@ export const handlers = {
     },
     matchBeforeSubmitAsync: async (req: express.Request, res: express.Response) => {
         utils.validateSchema(req.body.order, schemas.signedOrderSchema);
+        // tslint:disable no-console
         console.log(req.body);
+        // tslint:disable no-console
         console.log(req.query);
         const signedOrder = unmarshallOrder(req.body.order);
         if (WHITELISTED_TOKENS !== '*') {

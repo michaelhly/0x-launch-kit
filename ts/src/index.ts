@@ -7,16 +7,16 @@ import 'reflect-metadata';
 
 import { HTTP_PORT } from './config';
 import { initDBConnectionAsync } from './db_connection';
+import { load_fakeOrders } from './generate_fake_orders';
 import { handlers } from './handlers';
 import { errorHandler } from './middleware/error_handling';
 import { urlParamsParsing } from './middleware/url_params_parsing';
 import { utils } from './utils';
-import { load_fakeOrders } from './generate_fake_orders';
 
 (async () => {
     await initDBConnectionAsync();
     // This funciton will added fake orders to the DB
-    load_fakeOrders();
+    await load_fakeOrders();
     const app = express();
     app.use(cors());
     app.use(bodyParser.json());

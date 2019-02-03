@@ -3,7 +3,7 @@ import { Schema, SchemaValidator } from '@0x/json-schemas';
 import { ValidationError as SchemaValidationError } from 'jsonschema';
 import * as _ from 'lodash';
 
-import { OrderbookSide, RADIX_STRING, TEN_MINUTES_MS, ONE_SECOND_MS } from './constants';
+import { ONE_SECOND_MS, OrderbookSide, RADIX_STRING, TEN_MINUTES_MS } from './constants';
 import { ValidationError, ValidationErrorCodes, ValidationErrorItem } from './errors';
 import { SignedOrderModel } from './models/SignedOrderModel';
 
