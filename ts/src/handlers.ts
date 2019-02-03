@@ -99,7 +99,8 @@ export const handlers = {
     },
     matchBeforeSubmitAsync: async (req: express.Request, res: express.Response) => {
         utils.validateSchema(req.body.order, schemas.signedOrderSchema);
-
+        console.log(req.body);
+        console.log(req.query);
         const signedOrder = unmarshallOrder(req.body.order);
         if (WHITELISTED_TOKENS !== '*') {
             const allowedTokens: string[] = WHITELISTED_TOKENS;

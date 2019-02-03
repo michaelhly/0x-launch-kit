@@ -2,7 +2,7 @@
     "type": "sqlite",
     "database": "database.sqlite",
     "synchronize": true,
-    "logging": true,
+    "logging": false,
     "entities": ["ts/lib/entity/**/*.js", "js/entity/**/*.js"],
     "cli": {
         "entitiesDir": "ts/lib/entity"

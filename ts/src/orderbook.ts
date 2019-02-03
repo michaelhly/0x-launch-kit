@@ -12,12 +12,11 @@ import {
     PERMANENT_CLEANUP_INTERVAL_MS,
     RPC_URL,
 } from './config';
-import { MAX_TOKEN_SUPPLY_POSSIBLE } from './constants';
-
+import { MAX_TOKEN_SUPPLY_POSSIBLE, OrderbookSide } from './constants';
 import { getDBConnection } from './db_connection';
 import { SignedOrderModel } from './models/SignedOrderModel';
 import { paginate } from './paginator';
-import { mergeSortOrders, OrderbookSide, utils } from './utils';
+import { mergeSortOrders, utils } from './utils';
 
 // Mapping from an order hash to the timestamp when it was shadowed
 const shadowedOrders: Map<string, number> = new Map();

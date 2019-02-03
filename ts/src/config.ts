@@ -30,5 +30,3 @@ export const WHITELISTED_TOKENS: string[] | '*' = '*';
 export const RPC_URL = !_.isUndefined(process.env.RPC_URL) ? process.env.RPC_URL : 'https://rinkeby.infura.io/v3';
 // Default ERC20 token precision
 export const DEFAULT_ERC20_TOKEN_PRECISION = 18;
-
-export const RADIX_STRING = 10; // tslint:disable-line custom-no-magic-numbers

@@ -5,3 +5,20 @@ export const ZRX_DECIMALS = 18;
 export const DEFAULT_PAGE = 1;
 export const DEFAULT_PER_PAGE = 20;
 export const MAX_TOKEN_SUPPLY_POSSIBLE = new BigNumber(2).pow(256); // tslint:disable-line custom-no-magic-numbers
+export const RADIX_STRING = 10; // tslint:disable-line custom-no-magic-numbers
+
+export enum OrderSide {
+    Buy,
+    SELL,
+}
+
+export enum OrderbookSide {
+    Asks,
+    Bids,
+}
+
+export interface TokenAddressBundle {
+    VETH: string;
+    LONG: string;
+    SHORT: string;
+}

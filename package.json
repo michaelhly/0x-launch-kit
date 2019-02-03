@@ -12,7 +12,7 @@
         "prettier:ts": "prettier --write 'ts/**/*.ts' --config .prettierrc",
         "start:ts": "node ts/lib/index.js",
         "lint:ts": "tslint --project ts --format stylish",
-        "clean": "rm -rf ts/lib"
+        "restart": "rm -rf ts/lib && yarn build:ts && yarn start:ts"
     },
     "devDependencies": {
         "@0x/tslint-config": "^2.0.2",

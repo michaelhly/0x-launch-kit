@@ -2,7 +2,7 @@ import { Schema, SchemaValidator } from '@0x/json-schemas';
 import { ValidationError as SchemaValidationError } from 'jsonschema';
 import * as _ from 'lodash';
 
-import { RADIX_STRING } from './config';
+import { OrderbookSide, RADIX_STRING } from './constants';
 import { ValidationError, ValidationErrorCodes, ValidationErrorItem } from './errors';
 import { SignedOrderModel } from './models/SignedOrderModel';
 
@@ -79,11 +79,6 @@ function schemaValidationErrorToValidationErrorItem(schemaValidationError: Schem
     } else {
         throw new Error(`Unknnown schema validation error name: ${schemaValidationError.name}`);
     }
-}
-
-export enum OrderbookSide {
-    Asks,
-    Bids,
 }
 
 const calcPrice = (side: OrderbookSide, order: SignedOrderModel): number => {
