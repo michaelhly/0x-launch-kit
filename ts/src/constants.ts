@@ -9,7 +9,7 @@ export const RADIX_STRING = 10; // tslint:disable-line custom-no-magic-numbers
 
 export enum OrderSide {
     Buy,
-    SELL,
+    Sell,
 }
 
 export enum OrderbookSide {
