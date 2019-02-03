@@ -50,10 +50,17 @@ export const orderBook = {
         }
     },
     addOrderAsync: async (signedOrder: SignedOrder) => {
-        await orderWatcher.addOrderAsync(signedOrder);
+        // tslint:disable no-console
+        console.log('Adding signedOrder: \n', signedOrder);
+
+        /*** !!!Remeber to uncomment not using fake orders!!! ***/
+        // await orderWatcher.addOrderAsync(signedOrder);
+
         const signedOrderModel = serializeOrder(signedOrder);
         const connection = getDBConnection();
         await connection.manager.save(signedOrderModel);
+        // tslint:disable no-console
+        console.log('Added!\n');
     },
     getAssetPairsAsync: async (
         page: number,

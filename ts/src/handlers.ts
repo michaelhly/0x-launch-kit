@@ -78,7 +78,6 @@ export const handlers = {
         res.status(HttpStatus.OK).send(orderConfigResponse);
     },
     postOrderAsync: async (req: express.Request, res: express.Response) => {
-        console.log(req);
         utils.validateSchema(req.body, schemas.signedOrderSchema);
         const signedOrder = unmarshallOrder(req.body);
         if (WHITELISTED_TOKENS !== '*') {
