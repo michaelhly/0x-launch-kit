@@ -1,9 +1,8 @@
-import { BigNumber } from '0x.js';
 import { Schema, SchemaValidator } from '@0x/json-schemas';
 import { ValidationError as SchemaValidationError } from 'jsonschema';
 import * as _ from 'lodash';
 
-import { ONE_SECOND_MS, OrderbookSide, RADIX_STRING, TEN_MINUTES_MS } from './constants';
+import { OrderbookSide, RADIX_STRING } from './constants';
 import { ValidationError, ValidationErrorCodes, ValidationErrorItem } from './errors';
 import { SignedOrderModel } from './models/SignedOrderModel';
 
@@ -81,10 +80,6 @@ function schemaValidationErrorToValidationErrorItem(schemaValidationError: Schem
         throw new Error(`Unknnown schema validation error name: ${schemaValidationError.name}`);
     }
 }
-
-export const getRandomFutureDateInSeconds = (): BigNumber => {
-    return new BigNumber(Date.now() + TEN_MINUTES_MS).div(ONE_SECOND_MS).ceil();
-};
 
 const calcPrice = (side: OrderbookSide, order: SignedOrderModel): number => {
     return side === OrderbookSide.Asks

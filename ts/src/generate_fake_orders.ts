@@ -2,9 +2,9 @@ import { assetDataUtils, BigNumber, generatePseudoRandomSalt, SignedOrder } from
 import { schemas } from '@0x/json-schemas';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 
-import { NULL_ADDRESS, ZERO, ZRX_DECIMALS } from './constants';
+import { NULL_ADDRESS, ONE_SECOND_MS, TEN_MINUTES_MS, ZERO, ZRX_DECIMALS } from './constants';
 import { orderBook } from './orderbook';
-import { getRandomFutureDateInSeconds, utils } from './utils';
+import { utils } from './utils';
 
 // tslint:disable no-var-requires
 const tokens = require('../tokens.json');
@@ -12,6 +12,10 @@ const { VeilEther, LONG, SHORT } = tokens;
 const NUMBER_OF_ORDERS = 10;
 
 const random = (max: number) => Math.floor(Math.random() * (max + 1));
+
+const getRandomFutureDateInSeconds = (): BigNumber => {
+    return new BigNumber(Date.now() + TEN_MINUTES_MS).div(ONE_SECOND_MS).ceil();
+};
 
 const create_fake_order = (makerAssetAddress: string, takerAssetAddress: string): SignedOrder => {
     // tslint:disable-next-line:custom-no-magic-numbers
