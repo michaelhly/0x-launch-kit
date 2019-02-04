@@ -2,7 +2,8 @@ import { assetDataUtils, BigNumber, generatePseudoRandomSalt, SignedOrder } from
 import { schemas } from '@0x/json-schemas';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 
-import { NULL_ADDRESS, ONE_SECOND_MS, TEN_MINUTES_MS, ZERO, ZRX_DECIMALS } from './constants';
+import { DEFAULT_ERC20_TOKEN_PRECISION } from './config';
+import { NULL_ADDRESS, ONE_SECOND_MS, TEN_MINUTES_MS, ZERO } from './constants';
 import { orderBook } from './orderbook';
 import { utils } from './utils';
 
@@ -18,10 +19,16 @@ const getRandomFutureDateInSeconds = (): BigNumber => {
 };
 
 const create_fake_order = (makerAssetAddress: string, takerAssetAddress: string): SignedOrder => {
-    // tslint:disable-next-line:custom-no-magic-numbers
-    const makerAssetAmount = Web3Wrapper.toBaseUnitAmount(new BigNumber(random(10).toString()), ZRX_DECIMALS);
-    // tslint:disable-next-line:custom-no-magic-numbers
-    const takerAssetAmount = Web3Wrapper.toBaseUnitAmount(new BigNumber(random(10).toString()), ZRX_DECIMALS);
+    const makerAssetAmount = Web3Wrapper.toBaseUnitAmount(
+        new BigNumber(random(10).toString()), // tslint:custom-no-magic-numbers
+
+        DEFAULT_ERC20_TOKEN_PRECISION,
+    );
+    const takerAssetAmount = Web3Wrapper.toBaseUnitAmount(
+        new BigNumber(random(10).toString()), // tslint:custom-no-magic-numbers
+
+        DEFAULT_ERC20_TOKEN_PRECISION,
+    );
     return {
         exchangeAddress: '0xbce0b5f6eb618c565c3e5f5cd69652bbc279f44e',
         makerAddress: NULL_ADDRESS,

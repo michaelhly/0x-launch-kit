@@ -32,5 +32,4 @@ export const RPC_URL = !_.isUndefined(process.env.RPC_URL) ? process.env.RPC_URL
 export const INFURA_API_KEY = process.env.INFURA_API_KEY;
 // Default ERC20 token precision
 export const DEFAULT_ERC20_TOKEN_PRECISION = 18;
-export const RINKEBY_VEIL_CS = '0x26ee4b7de3b6be1fab4280cb35f3f4067a32a625';
 export const FEE_RECIPIENT_PRIVATE_KEY = process.env.PRIVATE_KEY;

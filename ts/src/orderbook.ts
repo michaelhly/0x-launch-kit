@@ -246,7 +246,7 @@ export const orderBook = {
         const signedOrderModels = (await connection.manager.find(SignedOrderModel, { where: filterObject })) as Array<
             Required<SignedOrderModel>
         >;
-        let signedOrders = _.map(signedOrderModels, deserializeOrder);
+        const signedOrders = _.map(signedOrderModels, deserializeOrder);
         return signedOrders;
     },
 };
