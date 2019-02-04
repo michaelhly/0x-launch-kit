@@ -2,9 +2,10 @@ import { Schema, SchemaValidator } from '@0x/json-schemas';
 import { ValidationError as SchemaValidationError } from 'jsonschema';
 import * as _ from 'lodash';
 
-import { OrderbookSide, RADIX_STRING } from './constants';
+import { RADIX_STRING } from './constants';
 import { ValidationError, ValidationErrorCodes, ValidationErrorItem } from './errors';
 import { SignedOrderModel } from './models/SignedOrderModel';
+import { OrderbookSide } from './types';
 
 const schemaValidator = new SchemaValidator();
 
