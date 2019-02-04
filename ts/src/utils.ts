@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import { RADIX_STRING } from './constants';
 import { ValidationError, ValidationErrorCodes, ValidationErrorItem } from './errors';
 import { SignedOrderModel } from './models/SignedOrderModel';
-import { OrderbookSide } from './types';
+import { OrderBookSide } from './types';
 
 const schemaValidator = new SchemaValidator();
 
@@ -82,15 +82,15 @@ function schemaValidationErrorToValidationErrorItem(schemaValidationError: Schem
     }
 }
 
-const calcPrice = (side: OrderbookSide, order: SignedOrderModel): number => {
-    return side === OrderbookSide.Asks
+const calcPrice = (side: OrderBookSide, order: SignedOrderModel): number => {
+    return side === OrderBookSide.Asks
         ? parseInt(order.takerAssetAmount as string, RADIX_STRING) /
               parseInt(order.makerAssetAmount as string, RADIX_STRING)
         : parseInt(order.makerAssetAmount as string, RADIX_STRING) /
               parseInt(order.takerAssetAmount as string, RADIX_STRING);
 };
 
-const merge = (side: OrderbookSide, left: SignedOrderModel[], right: SignedOrderModel[]): SignedOrderModel[] => {
+const merge = (side: OrderBookSide, left: SignedOrderModel[], right: SignedOrderModel[]): SignedOrderModel[] => {
     const merged: SignedOrderModel[] = [];
     let l: number = 0;
     let r: number = 0;
@@ -124,7 +124,7 @@ const merge = (side: OrderbookSide, left: SignedOrderModel[], right: SignedOrder
 };
 
 export const mergeSortOrders = (
-    side: OrderbookSide,
+    side: OrderBookSide,
     signedOrderModels: Array<Required<SignedOrderModel>>,
 ): Array<Required<SignedOrderModel>> => {
     const totalOrders = signedOrderModels.length;

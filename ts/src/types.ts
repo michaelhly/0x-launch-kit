@@ -3,12 +3,12 @@ export enum OrderSide {
     Sell,
 }
 
-export enum OrderbookSide {
+export enum OrderBookSide {
     Asks,
     Bids,
 }
 
-export interface TokenAddressBundle {
+export interface TokenAssetBundle {
     VETH: string;
     LONG: string;
     SHORT: string;

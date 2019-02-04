@@ -16,7 +16,7 @@ import { MAX_TOKEN_SUPPLY_POSSIBLE } from './constants';
 import { getDBConnection } from './db_connection';
 import { SignedOrderModel } from './models/SignedOrderModel';
 import { paginate } from './paginator';
-import { OrderbookSide } from './types';
+import { OrderBookSide, OrderSide, TokenAssetBundle } from './types';
 import { mergeSortOrders, utils } from './utils';
 
 // Mapping from an order hash to the timestamp when it was shadowed
@@ -142,12 +142,12 @@ export const orderBook = {
         const unsortedBidSignedOrderModels = (await connection.manager.find(SignedOrderModel, {
             where: { takerAssetData: baseAssetData, makerAssetData: quoteAssetData },
         })) as Array<Required<SignedOrderModel>>;
-        const bidSignedOrderModels = mergeSortOrders(OrderbookSide.Bids, unsortedBidSignedOrderModels);
+        const bidSignedOrderModels = mergeSortOrders(OrderBookSide.Bids, unsortedBidSignedOrderModels);
 
         const unsortedAskSignedOrderModels = (await connection.manager.find(SignedOrderModel, {
             where: { takerAssetData: quoteAssetData, makerAssetData: baseAssetData },
         })) as Array<Required<SignedOrderModel>>;
-        const askSignedOrderModels = mergeSortOrders(OrderbookSide.Asks, unsortedAskSignedOrderModels);
+        const askSignedOrderModels = mergeSortOrders(OrderBookSide.Asks, unsortedAskSignedOrderModels);
 
         const bidApiOrders: APIOrder[] = bidSignedOrderModels
             .map(deserializeOrder)
@@ -236,17 +236,47 @@ export const orderBook = {
             return { metaData: {}, order: deserializedOrder };
         }
     },
-    getDirectCounterOrdersAsync: async (signedOrder: SignedOrder): Promise<SignedOrder[]> => {
+    getDirectCounterOrdersAsync: async (side: OrderSide, signedOrder: SignedOrder): Promise<SignedOrder[]> => {
         const connection = getDBConnection();
         const filterValues: Partial<SignedOrder> = {
             makerAssetData: signedOrder.takerAssetData,
             takerAssetData: signedOrder.makerAssetData,
         };
         const filterObject = _.pickBy(filterValues, _.identity.bind(_));
+        const orderBookSide: OrderBookSide = side === OrderSide.Buy ? OrderBookSide.Asks : OrderBookSide.Bids;
         const signedOrderModels = (await connection.manager.find(SignedOrderModel, { where: filterObject })) as Array<
             Required<SignedOrderModel>
         >;
-        const signedOrders = _.map(signedOrderModels, deserializeOrder);
+        const signedOrders = _.map(mergeSortOrders(orderBookSide, signedOrderModels), deserializeOrder);
+        return signedOrders;
+    },
+    getIndirectCounterOrdersAsync: async (
+        side: OrderSide,
+        tokenAssets: TokenAssetBundle,
+        signedOrder: SignedOrder,
+    ): Promise<SignedOrder[]> => {
+        const connection = getDBConnection();
+        const filterValues: Partial<SignedOrder> = {
+            makerAssetData:
+                signedOrder.makerAssetData === tokenAssets.VETH
+                    ? tokenAssets.VETH
+                    : signedOrder.takerAssetData === tokenAssets.LONG
+                    ? tokenAssets.SHORT
+                    : tokenAssets.LONG,
+            takerAssetData:
+                signedOrder.takerAssetData === tokenAssets.VETH
+                    ? tokenAssets.VETH
+                    : signedOrder.takerAssetData === tokenAssets.LONG
+                    ? tokenAssets.SHORT
+                    : tokenAssets.LONG,
+        };
+
+        const filterObject = _.pickBy(filterValues, _.identity.bind(_));
+        const orderBookSide: OrderBookSide = side === OrderSide.Buy ? OrderBookSide.Bids : OrderBookSide.Asks;
+        const signedOrderModels = (await connection.manager.find(SignedOrderModel, { where: filterObject })) as Array<
+            Required<SignedOrderModel>
+        >;
+        const signedOrders = _.map(mergeSortOrders(orderBookSide, signedOrderModels), deserializeOrder);
         return signedOrders;
     },
 };
