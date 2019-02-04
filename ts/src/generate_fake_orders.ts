@@ -20,12 +20,12 @@ const getRandomFutureDateInSeconds = (): BigNumber => {
 
 const create_fake_order = (makerAssetAddress: string, takerAssetAddress: string): SignedOrder => {
     const makerAssetAmount = Web3Wrapper.toBaseUnitAmount(
-        new BigNumber(random(10).toString()), // tslint:custom-no-magic-numbers
+        new BigNumber(random(10).toString()), // tslint:disable-line custom-no-magic-numbers
 
         DEFAULT_ERC20_TOKEN_PRECISION,
     );
     const takerAssetAmount = Web3Wrapper.toBaseUnitAmount(
-        new BigNumber(random(10).toString()), // tslint:custom-no-magic-numbers
+        new BigNumber(random(10).toString()), // tslint:disable-line custom-no-magic-numbers
 
         DEFAULT_ERC20_TOKEN_PRECISION,
     );

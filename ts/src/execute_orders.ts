@@ -1,23 +1,16 @@
-import { BigNumber, ContractWrappers, Provider, SignedOrder } from '0x.js';
+import { BigNumber, ContractWrappers, SignedOrder } from '0x.js';
 import { Web3Wrapper } from '@0x/web3-wrapper';
 import { TransactionReceiptWithDecodedLogs } from 'ethereum-types';
 
-import { FEE_RECIPIENT, FEE_RECIPIENT_PRIVATE_KEY, INFURA_API_KEY, NETWORK_ID, RPC_URL } from './config';
-
-// tslint:disable no-var-requires
-const HDWalletProvider = require('truffle-hdwallet-provider');
-const provider = new HDWalletProvider(FEE_RECIPIENT_PRIVATE_KEY, `${RPC_URL}/${INFURA_API_KEY}`);
-
-const Web3 = require('web3');
-const web3 = new Web3(provider);
-const currentProvider: Provider = web3.currentProvider;
+import { FEE_RECIPIENT, NETWORK_ID } from './config';
+import { providerEngine } from './provider_engine';
 
 const get_contractWrappers = (): ContractWrappers => {
-    return new ContractWrappers(currentProvider, { networkId: NETWORK_ID });
+    return new ContractWrappers(providerEngine, { networkId: NETWORK_ID });
 };
 
 const get_web3Wrapper = (contractWrapper: ContractWrappers): Web3Wrapper => {
-    const web3Wrapper = new Web3Wrapper(currentProvider);
+    const web3Wrapper = new Web3Wrapper(providerEngine);
     web3Wrapper.abiDecoder.addABI(contractWrapper.exchange.abi);
     web3Wrapper.abiDecoder.addABI(contractWrapper.erc20Token.abi);
     return web3Wrapper;
