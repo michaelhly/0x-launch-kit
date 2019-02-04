@@ -12,10 +12,11 @@ import {
     PERMANENT_CLEANUP_INTERVAL_MS,
     RPC_URL,
 } from './config';
-import { MAX_TOKEN_SUPPLY_POSSIBLE, OrderbookSide } from './constants';
+import { MAX_TOKEN_SUPPLY_POSSIBLE } from './constants';
 import { getDBConnection } from './db_connection';
 import { SignedOrderModel } from './models/SignedOrderModel';
 import { paginate } from './paginator';
+import { OrderbookSide } from './types';
 import { mergeSortOrders, utils } from './utils';
 
 // Mapping from an order hash to the timestamp when it was shadowed
@@ -234,6 +235,19 @@ export const orderBook = {
             const deserializedOrder = deserializeOrder(signedOrderModelIfExists as Required<SignedOrderModel>);
             return { metaData: {}, order: deserializedOrder };
         }
+    },
+    getDirectCounterOrdersAsync: async (signedOrder: SignedOrder): Promise<SignedOrder[]> => {
+        const connection = getDBConnection();
+        const filterValues: Partial<SignedOrder> = {
+            makerAssetData: signedOrder.takerAssetData,
+            takerAssetData: signedOrder.makerAssetData,
+        };
+        const filterObject = _.pickBy(filterValues, _.identity.bind(_));
+        const signedOrderModels = (await connection.manager.find(SignedOrderModel, { where: filterObject })) as Array<
+            Required<SignedOrderModel>
+        >;
+        let signedOrders = _.map(signedOrderModels, deserializeOrder);
+        return signedOrders;
     },
 };
 
