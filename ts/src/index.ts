@@ -60,7 +60,7 @@ import { utils } from './utils';
     /**
      * POST Order and check for matching counter-order. If counter-order found, fill both orders. Otherwise submit order to orderbook.
      */
-    app.post('/v2/match_order', asyncHandler(handlers.matchBeforeSubmitAsync));
+    app.post('/v2/match_then_submit', asyncHandler(handlers.matchThenSubmitAsync));
 
     app.use(errorHandler);
 

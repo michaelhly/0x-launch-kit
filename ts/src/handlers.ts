@@ -96,7 +96,7 @@ export const handlers = {
             res.status(HttpStatus.OK).send(orderIfExists);
         }
     },
-    matchBeforeSubmitAsync: async (req: express.Request, res: express.Response) => {
+    matchThenSubmitAsync: async (req: express.Request, res: express.Response) => {
         utils.validateSchema(req.body.order, schemas.signedOrderSchema);
         // tslint:disable no-console
         console.log(req.body);
