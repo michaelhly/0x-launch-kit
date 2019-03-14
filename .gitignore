@@ -73,3 +73,5 @@ ts/lib
 database.sqlite
 
 TODO.txt
+.DS_Store
+/ts/.DS_Store
